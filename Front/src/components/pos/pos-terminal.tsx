@@ -12,10 +12,9 @@ import { ProductGrid } from "./product-grid";
 import { CartButton } from "./cart-button";
 import { CartDrawer } from "./cart-drawer";
 import { BottomNav, type AppSection } from "./bottom-nav";
-
-import { ReportsScreen } from "../reports/Reports";
-import { OrderScreen } from "@/components/orders/Orders";
 import { InventoryScreen } from "@/components/inventory/Inventory";
+import { OrderScreen } from "../orders/Orders";
+import { ReportsScreen } from "../reports/Reports";
 
 export function PosTerminal() {
   const [activeSection, setActiveSection] = useState<AppSection>("ventas");
@@ -34,6 +33,19 @@ export function PosTerminal() {
       });
     },
     [add],
+  );
+
+  const handleRemoveProduct = useCallback(
+    (product: Product) => {
+      const item = items.find((i) => i.product.id === product.id);
+      if (!item) return;
+      if (item.quantity === 1) {
+        remove(product.id);
+      } else {
+        update(product.id, item.quantity - 1);
+      }
+    },
+    [items, remove, update],
   );
 
   const handleClear = useCallback(() => {
@@ -76,6 +88,7 @@ export function PosTerminal() {
                   searchQuery={searchQuery}
                   cartItems={items}
                   onAddProduct={handleAddProduct}
+                  onRemoveProduct={handleRemoveProduct}
                 />
               </div>
             </div>

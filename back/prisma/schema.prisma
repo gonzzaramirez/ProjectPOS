@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+enum Role {
+  Admin
+  Vendedor
+  Cocina
+}
+
+enum OrderStatus {
+  Pendiente
+  Preparado
+  Entregado
+  Cancelado
+}
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Point {
+  id_point Int @id @default(autoincrement())
+  point String 
+  tag String
+
+  users User[]
+  products Product[]
+  categories Category[]
+  orders Order[]
+  orderItem OrderItem[]
+
+}
+
+
+model User {
+  id Int @id @default(autoincrement())
+  user String @unique @db.VarChar(100)
+  password String @db.Text
+  role Role @default(Vendedor)
+  active Boolean @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  //FK
+  id_point Int
+  
+  point Point @relation(fields: [id_point],references:[id_point])
+}
+
+// Categoría
+model Category {
+  id_category Int @id @default(autoincrement())
+  category String @db.VarChar(100)
+  description String @db.Text
+
+  // FK
+  id_point Int
+
+  point Point @relation(fields:[id_point],references: [id_point])
+  products Product[]
+}
+
+// Productos
+model Product{
+  id_product Int @id @default(autoincrement())
+  product_name String @db.VarChar(255)
+  price Float
+  stock Int
+  requires_cooking Boolean @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  //FK
+  id_category Int
+  id_point Int
+
+  category Category @relation(fields: [id_category], references: [id_category])
+  point Point @relation(fields:[id_point],references:[id_point])
+  orderItems OrderItem[]
+
+}
+
+ // Pedidos
+ model Order {
+  id_order Int @id @default(autoincrement())
+  order_number Int @unique @default(autoincrement())
+  status OrderStatus @default(Pendiente)
+  client_name String @db.VarChar(100)
+  client_dni Int
+  total Float
+  payment_method String @db.VarChar(100)
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  //FK
+  id_point Int
+
+  point Point @relation(fields: [id_point],references: [id_point])
+  OrderItems OrderItem[]
+  
+ }
+
+/* ITEMS DE PEDIDO */
+ model OrderItem {
+  id_order_item Int @id @default(autoincrement())
+  quantity Int
+  price_at_sale Float
+
+  //FK
+  id_order Int
+  id_product Int
+  id_point Int
+
+  order Order @relation(fields: [id_order],references: [id_order])
+  product Product @relation(fields: [id_product],references: [id_product])
+  point Point @relation(fields: [id_point],references: [id_point])
+
+ }
+

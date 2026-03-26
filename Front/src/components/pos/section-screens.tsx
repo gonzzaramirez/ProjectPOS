@@ -1,4 +1,4 @@
-"use client"
+/* "use client"
 
 import { motion } from "motion/react"
 import { Package, ClipboardList, BarChart2 } from "lucide-react"
@@ -65,4 +65,4 @@ export function ReportesScreen() {
       description="Estadísticas de ventas, productos más vendidos y totales diarios."
     />
   )
-}
+} */

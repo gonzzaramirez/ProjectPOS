@@ -42,9 +42,15 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# DOCKER
+
+docker-compose.yml
+
 # temp directory
 .temp
 .tmp
+
+
 
 # Runtime data
 pids
@@ -54,3 +60,5 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+/generated/prisma

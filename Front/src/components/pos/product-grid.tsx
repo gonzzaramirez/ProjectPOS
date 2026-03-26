@@ -12,6 +12,7 @@ type ProductGridProps = {
   searchQuery: string
   cartItems: CartItem[]
   onAddProduct: (product: Product) => void
+  onRemoveProduct?: (product: Product) => void  // ← nuevo
 }
 
 export function ProductGrid({
@@ -19,6 +20,7 @@ export function ProductGrid({
   searchQuery,
   cartItems,
   onAddProduct,
+  onRemoveProduct,
 }: ProductGridProps) {
   const filteredProducts = useMemo(() => {
     let products = PRODUCTS
@@ -76,6 +78,7 @@ export function ProductGrid({
           key={product.id}
           product={product}
           onAdd={onAddProduct}
+          onRemove={onRemoveProduct}
           cartQuantity={cartMap.get(product.id) ?? 0}
           index={i}
         />
