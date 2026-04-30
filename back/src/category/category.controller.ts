@@ -31,7 +31,7 @@ export class CategoryController {
     return this.categoryService.findAll(filters);
   }
 
-   @Get(':id')
+  @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.findOne(id);
   }
@@ -44,7 +44,7 @@ export class CategoryController {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
-    @Delete(':id')
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.categoryService.remove(id);

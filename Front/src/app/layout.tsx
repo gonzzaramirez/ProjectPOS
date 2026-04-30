@@ -13,7 +13,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "POS Terminal - Carnaval MC",
   description: "Terminal de punto de venta para cantinas de carnaval",
-  generator: "v0.app",
+
   icons: {
     icon: [
       {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FAFAFA",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${inter.variable} font-sans antialiased overflow-hidden text-[15px]`}
+        className={`${inter.variable} font-sans antialiased overflow-hidden text-[15px] bg-background text-foreground`}
         style={{
           WebkitFontSmoothing: "antialiased",
           MozOsxFontSmoothing: "grayscale",

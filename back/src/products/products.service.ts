@@ -22,10 +22,11 @@ export class ProductsService {
   }
 
   async findAll(filters: FilterProductDto) {
-    const { page = 1, limit = 10, id_category, search, id_point } = filters;
+    const { page = 1, limit = 10, id_category, search, id_point, id_market } = filters;
     const skip = (page - 1) * limit;
 
     const where = {
+      ...(id_market && { id_market }),
       ...(id_category && { id_category }),
       ...(id_point && { id_point }),
       ...(search && {
@@ -92,26 +93,25 @@ export class ProductsService {
     });
   }
 
-  //  DESCONTAR STOCK 
+  //  DESCONTAR STOCK
   async decrementStock(id_product: number, quantity: number) {
     const product = await this.findOne(id_product);
- 
+
     if (product.stock < quantity) {
       throw new BadRequestException(
         `Stock insuficiente para "${product.product_name}". ` +
           `Disponible: ${product.stock}, solicitado: ${quantity}`,
       );
     }
- 
+
     return this.prisma.product.update({
       where: { id_product },
       data: { stock: { decrement: quantity } },
     });
   }
 
-
   // HELPER
-  
+
   private async validateCategoryExists(id_category: number) {
     const category = await this.prisma.category.findUnique({
       where: { id_category },

@@ -3,11 +3,12 @@
 import { useMemo } from "react"
 import { motion } from "motion/react"
 import { Search } from "lucide-react"
-import { PRODUCTS, type Product } from "@/src/lib/pos-types"
+import type { Product } from "@/src/lib/pos-types"
 import type { CartItem } from "@/src/lib/pos-types"
 import { ProductCard } from "./product-card"
 
 type ProductGridProps = {
+  products: Product[]
   activeCategory: string
   searchQuery: string
   cartItems: CartItem[]
@@ -16,6 +17,7 @@ type ProductGridProps = {
 }
 
 export function ProductGrid({
+  products,
   activeCategory,
   searchQuery,
   cartItems,
@@ -23,19 +25,19 @@ export function ProductGrid({
   onRemoveProduct,
 }: ProductGridProps) {
   const filteredProducts = useMemo(() => {
-    let products = PRODUCTS
+    let list = products
 
     if (activeCategory !== "todos") {
-      products = products.filter((p) => p.category === activeCategory)
+      list = list.filter((p) => p.category === activeCategory)
     }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim()
-      products = products.filter((p) => p.name.toLowerCase().includes(q))
+      list = list.filter((p) => p.name.toLowerCase().includes(q))
     }
 
-    return products
-  }, [activeCategory, searchQuery])
+    return list
+  }, [products, activeCategory, searchQuery])
 
   const cartMap = useMemo(() => {
     const map = new Map<string, number>()

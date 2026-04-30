@@ -11,4 +11,7 @@ export class CreateCategoryDto {
 
   @IsInt()
   id_point: number;
+
+  @IsInt()
+  id_market: number;
 }

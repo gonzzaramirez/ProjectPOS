@@ -52,10 +52,10 @@ const STATUS_CONFIG: Record<
     colHeader: string  // color for column title icon
   }
 > = {
-  pending:   { label: "Pendiente",  icon: Clock,        pill: "bg-yellow-400/15 text-yellow-500 ring-yellow-400/20",  colHeader: "text-yellow-500"  },
-  preparing: { label: "Preparando", icon: Package,      pill: "bg-blue-400/15   text-blue-500   ring-blue-400/20",    colHeader: "text-blue-500"    },
-  ready:     { label: "Listo",      icon: CheckCircle,  pill: "bg-emerald-400/15 text-emerald-500 ring-emerald-400/20", colHeader: "text-emerald-500" },
-  delivered: { label: "Entregado",  icon: Truck,        pill: "bg-foreground/8  text-muted-foreground ring-border",    colHeader: "text-muted-foreground" },
+  pending:   { label: "Pendiente",  icon: Clock,        pill: "app-card-subtle text-primary ring-primary/20",  colHeader: "text-primary"  },
+  preparing: { label: "Preparando", icon: Package,      pill: "bg-primary/10 text-primary ring-primary/20",    colHeader: "text-primary"    },
+  ready:     { label: "Listo",      icon: CheckCircle,  pill: "bg-accent/10 text-accent-foreground ring-accent/30", colHeader: "text-accent-foreground" },
+  delivered: { label: "Entregado",  icon: Truck,        pill: "app-card-subtle text-muted-foreground ring-border",    colHeader: "text-muted-foreground" },
 }
 
 const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
@@ -65,9 +65,9 @@ const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
 }
 
 const NEXT_BUTTON_CLASS: Partial<Record<OrderStatus, string>> = {
-  pending:   "bg-blue-500/15 text-blue-500 ring-blue-400/25 hover:bg-blue-500/25",
-  preparing: "bg-emerald-500/15 text-emerald-500 ring-emerald-400/25 hover:bg-emerald-500/25",
-  ready:     "bg-foreground/8 text-muted-foreground ring-border hover:bg-foreground/15",
+  pending:   "bg-primary/10 text-primary ring-primary/30 hover:bg-accent/20",
+  preparing: "bg-accent/10 text-accent-foreground ring-accent/30 hover:bg-accent/20",
+  ready:     "app-card-subtle text-muted-foreground ring-border hover:bg-muted",
 }
 
 const PAYMENT_CONFIG: Record<
@@ -103,18 +103,18 @@ function OrderCard({
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
     >
-      <article className="liquid-glass-card rounded-2xl overflow-hidden">
+      <article className="app-card overflow-hidden rounded-2xl shadow-md">
         {/* Header row */}
         <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-3">
           <div className="flex items-center gap-3 min-w-0">
             {/* Order number badge */}
-            <span className="shrink-0 flex items-center justify-center size-11 rounded-xl bg-primary/10 text-primary font-black text-base tabular-nums">
+            <span className="shrink-0 flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary font-black text-base tabular-nums">
               #{order.orderNumber}
             </span>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <User className="size-3.5 text-muted-foreground shrink-0" />
-                <p className="font-semibold text-sm text-foreground truncate">{order.customerName}</p>
+                <p className="truncate text-sm font-semibold text-foreground">{order.customerName}</p>
               </div>
               <p className="text-[11px] text-muted-foreground mt-0.5">
                 {new Date(order.timestamp).toLocaleTimeString("es-AR", {
@@ -128,7 +128,7 @@ function OrderCard({
           {/* Status pill */}
           <span
             className={cn(
-              "shrink-0 flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold ring-1",
+              "shrink-0 flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold ring-1",
               status.pill
             )}
           >
@@ -138,12 +138,12 @@ function OrderCard({
         </div>
 
         {/* Items list */}
-        <div className="mx-4 mb-3 rounded-xl bg-muted/40 border border-white/20 dark:border-white/8 divide-y divide-white/15 dark:divide-white/8">
+        <div className="app-card-subtle mx-4 mb-3 divide-y divide-border rounded-xl">
           {order.items.map((item, i) => (
             <div key={i} className="flex items-center justify-between px-3 py-2 gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <span className="text-lg leading-none">{item.image}</span>
-                <span className="text-[13px] font-medium text-foreground truncate">{item.name}</span>
+                <span className="truncate text-[13px] font-medium text-foreground">{item.name}</span>
               </div>
               <div className="flex items-center gap-2.5 shrink-0">
                 <span className="text-[11px] text-muted-foreground">×{item.quantity}</span>
@@ -156,7 +156,7 @@ function OrderCard({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 px-4 pb-4 pt-2 border-t border-white/20 dark:border-white/8">
+        <div className="flex items-center justify-between gap-3 border-t border-border px-4 pb-4 pt-2">
           <div className="flex items-center gap-3">
             {/* Payment */}
             <span className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
@@ -199,7 +199,7 @@ function SummaryPill({
   colorClass: string
 }) {
   return (
-    <div className="liquid-glass-card px-3 py-2 rounded-xl text-center min-w-[64px]">
+    <div className="app-card min-w-[64px] rounded-xl px-3 py-2 text-center shadow-sm">
       <p className={cn("text-xl font-black tabular-nums", colorClass)}>{count}</p>
       <p className="text-[10px] text-muted-foreground font-medium mt-0.5">{label}</p>
     </div>
@@ -251,16 +251,16 @@ export function OrderScreen({
   return (
     <div className="flex flex-col flex-1 overflow-hidden pb-16">
       {/* Summary row */}
-      <div className="px-4 py-3 flex items-center gap-2 border-b border-border">
-        <SummaryPill label="Pendiente"  count={pending.length}   colorClass="text-yellow-500"  />
-        <SummaryPill label="Preparando" count={preparing.length} colorClass="text-blue-500"    />
-        <SummaryPill label="Listos"     count={ready.length}     colorClass="text-emerald-500" />
+      <div className="app-surface-dark flex items-center gap-2 border-b px-4 py-3">
+        <SummaryPill label="Pendiente"  count={pending.length}   colorClass="text-primary"  />
+        <SummaryPill label="Preparando" count={preparing.length} colorClass="text-primary"    />
+        <SummaryPill label="Listos"     count={ready.length}     colorClass="text-accent-foreground" />
         <SummaryPill label="Entregado"  count={delivered.length} colorClass="text-muted-foreground" />
       </div>
 
       {/* Filter tabs */}
       <div
-        className="flex gap-1 px-4 py-2.5 overflow-x-auto scrollbar-none shrink-0 border-b border-border"
+        className="app-surface-dark scrollbar-none flex shrink-0 gap-1 overflow-x-auto border-b px-4 py-2.5"
         role="tablist"
       >
         {FILTER_TABS.map((t) => (
@@ -272,8 +272,8 @@ export function OrderScreen({
             className={cn(
               "px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-150 active:scale-[0.98]",
               filter === t.id
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground"
+                ? "app-tab-active"
+                : "app-text-muted-inverse hover:text-foreground"
             )}
           >
             {t.label}

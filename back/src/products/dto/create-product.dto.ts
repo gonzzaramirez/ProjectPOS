@@ -28,6 +28,9 @@ export class CreateProductDto {
   @IsInt()
   id_point: number;
 
+  @IsInt()
+  id_market: number;
+
   @IsBoolean()
   @IsOptional()
   requires_cooking?: boolean = false;

@@ -7,7 +7,10 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
     const connectionString = process.env.DATABASE_URL;
 
@@ -15,12 +18,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       throw new Error('DATABASE_URL no está definida en el archivo .env');
     }
 
-    const pool = new Pool({ 
+    const pool = new Pool({
       connectionString,
     });
-    
+
     const adapter = new PrismaPg(pool);
-    
+
     super({ adapter });
   }
 

@@ -1,5 +1,5 @@
-import { PosTerminal } from "@/src/components/pos/pos-terminal"
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <PosTerminal />
+  redirect("/login");
 }

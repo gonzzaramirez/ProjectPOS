@@ -1,34 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { PointService } from './point.service';
 import { CreatePointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
 
-@Controller('point')
+@Controller('points')
 export class PointController {
   constructor(private readonly pointService: PointService) {}
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   create(@Body() createPointDto: CreatePointDto) {
     return this.pointService.create(createPointDto);
   }
 
   @Get()
-  findAll() {
-    return this.pointService.findAll();
+  findAll(@Query('id_market') id_market?: number) {
+    return this.pointService.findAll(id_market);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pointService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.pointService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePointDto: UpdatePointDto) {
-    return this.pointService.update(+id, updatePointDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePointDto: UpdatePointDto,
+  ) {
+    return this.pointService.update(id, updatePointDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pointService.remove(+id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.pointService.remove(id);
   }
 }

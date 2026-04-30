@@ -36,12 +36,12 @@ export function PosHeader() {
 
   return (
     <header className="flex items-center justify-between w-full">
-      <span className="text-sm font-medium text-foreground tracking-tight">
+      <span className="app-text-inverse text-sm font-medium tracking-tight">
         PosMC
       </span>
       <div className="flex items-center gap-2.5">
         <span
-          className="text-xs text-muted-foreground tabular-nums"
+          className="app-text-muted-inverse text-xs tabular-nums"
           aria-hidden="true"
         >
           {time}
@@ -52,10 +52,10 @@ export function PosHeader() {
           aria-label={isOnline ? "Conectado" : "Sin conexión"}
         >
           {isOnline ? (
-            <Wifi className="size-3.5 text-primary" strokeWidth={2} />
+            <Wifi className="size-3.5 text-accent" strokeWidth={2} />
           ) : (
             <WifiOff
-              className="size-3.5 text-muted-foreground"
+              className="app-text-muted-inverse size-3.5"
               strokeWidth={2}
             />
           )}

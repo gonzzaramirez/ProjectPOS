@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --background: oklch(1.0000 0 0);
   --foreground: oklch(0.3211 0 0);
@@ -37,8 +39,8 @@
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
   --radius: 0.375rem;
-  --shadow-x: 0px;
-  --shadow-y: 2px;
+  --shadow-x: 0;
+  --shadow-y: 1px;
   --shadow-blur: 3px;
   --shadow-spread: 0px;
   --shadow-opacity: 0.1;
@@ -53,16 +55,7 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
-  --shadow-offset-x: 0;
-  --shadow-offset-y: 1px;
-  --letter-spacing: 0em;
-  /* Glass (solo colores del tema) */
-  --glass-bg: color-mix(in oklch, var(--card) 88%, transparent);
-  --glass-border: color-mix(in oklch, var(--border) 90%, transparent);
-  --glass-shadow: 0 0 0 1px color-mix(in oklch, var(--foreground) 4%, transparent), 0 4px 24px -4px color-mix(in oklch, var(--foreground) 10%, transparent);
 }
-
-@custom-variant dark (&:is(.dark *));
 
 .dark {
   --background: oklch(0.2046 0 0);
@@ -101,8 +94,8 @@
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
   --radius: 0.375rem;
-  --shadow-x: 0px;
-  --shadow-y: 2px;
+  --shadow-x: 0;
+  --shadow-y: 1px;
   --shadow-blur: 3px;
   --shadow-spread: 0px;
   --shadow-opacity: 0.1;
@@ -115,13 +108,6 @@
   --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);
   --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
-  --shadow-offset-x: 0;
-  --shadow-offset-y: 1px;
-  --letter-spacing: 0em;
-  --spacing: 0.25rem;
-  --glass-bg: color-mix(in oklch, var(--card) 92%, transparent);
-  --glass-border: color-mix(in oklch, var(--border) 85%, transparent);
-  --glass-shadow: 0 0 0 1px color-mix(in oklch, var(--foreground) 12%, transparent), 0 8px 32px -8px color-mix(in oklch, var(--foreground) 35%, transparent);
 }
 
 @theme inline {
@@ -158,9 +144,9 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: Inter, sans-serif;
-  --font-mono: JetBrains Mono, monospace;
-  --font-serif: Source Serif 4, serif;
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -175,94 +161,81 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
-
-  --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
-  --tracking-tight: calc(var(--tracking-normal) - 0.025em);
-  --tracking-normal: var(--tracking-normal);
-  --tracking-wide: calc(var(--tracking-normal) + 0.025em);
-  --tracking-wider: calc(var(--tracking-normal) + 0.05em);
-  --tracking-widest: calc(var(--tracking-normal) + 0.1em);
-  --radius: 0.375rem;
-  --spacing: var(--spacing);
-  --letter-spacing: var(--letter-spacing);
-  --shadow-offset-y: var(--shadow-offset-y);
-  --shadow-offset-x: var(--shadow-offset-x);
-  --shadow-spread: var(--shadow-spread);
-  --shadow-blur: var(--shadow-blur);
-  --shadow-opacity: var(--shadow-opacity);
-  --color-shadow-color: var(--shadow-color);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
-}
-
-body {
-  letter-spacing: var(--tracking-normal);
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
   body {
-    letter-spacing: var(--tracking-normal);
+    @apply bg-background text-foreground;
   }
 }
 
-/* Liquid glass: solo variables de globals */
-.liquid-glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  box-shadow: var(--glass-shadow);
-}
+@layer components {
+  .app-surface-dark {
+    @apply bg-secondary text-foreground border-border;
+  }
 
-.liquid-glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(32px) saturate(200%);
-  -webkit-backdrop-filter: blur(32px) saturate(200%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
+  .app-text-inverse {
+    @apply text-foreground;
+  }
 
-.liquid-glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  box-shadow: var(--glass-shadow);
-}
+  .app-text-muted-inverse {
+    @apply text-muted-foreground;
+  }
 
-.liquid-glass-input {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  box-shadow: var(--glass-shadow);
-}
+  .app-card {
+    @apply bg-card text-card-foreground border border-border;
+  }
 
-.liquid-glass-pill {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  border: 1px solid var(--glass-border);
-  border-radius: 9999px;
-}
+  .app-card-subtle {
+    @apply bg-muted text-foreground border border-border;
+  }
 
-.liquid-glass-drawer {
-  background: var(--glass-bg);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-left: 1px solid var(--glass-border);
-  box-shadow: -8px 0 32px -8px color-mix(in oklch, var(--foreground) 15%, transparent);
-}
+  .app-badge {
+    @apply bg-muted text-foreground;
+  }
 
-.liquid-glass-float {
-  background: var(--glass-bg);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  box-shadow: var(--glass-shadow);
+  .app-tab-active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .app-tab-inactive {
+    @apply bg-secondary text-muted-foreground border border-border;
+  }
+
+  .app-btn-icon {
+    @apply border border-primary bg-card text-primary;
+  }
+
+  .app-btn-icon-primary {
+    @apply border border-primary bg-primary text-primary-foreground;
+  }
+
+  .app-btn-icon:hover,
+  .app-btn-icon-primary:hover {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  .ps-display {
+    @apply font-light tracking-tight leading-tight;
+  }
+
+  .ps-pill-btn {
+    @apply min-h-12 rounded-full px-6 py-3 bg-primary text-primary-foreground border-2 border-transparent transition;
+  }
+
+  .ps-pill-btn:hover,
+  .ps-pill-btn:focus-visible {
+    @apply bg-accent border-primary-foreground ring-2 ring-primary scale-[1.03];
+  }
+
+  .ps-input {
+    @apply w-full rounded-md border border-input bg-background px-3 py-2 text-foreground;
+  }
+
+  .ps-input:focus-visible {
+    @apply outline-none ring-2 ring-ring;
+  }
 }

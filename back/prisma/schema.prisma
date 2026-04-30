@@ -1,11 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
 enum Role {
   Admin
-  Vendedor
-  Cocina
+  Cajero
 }
 
 enum OrderStatus {
@@ -15,6 +10,15 @@ enum OrderStatus {
   Cancelado
 }
 
+enum ShiftStatus {
+  Abierto
+  Cerrado
+}
+
+enum PaymentMethod {
+  Efectivo
+  Digital
+}
 
 generator client {
   provider = "prisma-client-js"
@@ -24,99 +28,190 @@ datasource db {
   provider = "postgresql"
 }
 
-model Point {
-  id_point Int @id @default(autoincrement())
-  point String 
-  tag String
+model Market {
+  id_market  Int      @id @default(autoincrement())
+  name       String   @db.VarChar(150)
+  slug       String   @unique @db.VarChar(100)
+  active     Boolean  @default(true)
+  flags      Json     @default("{}")
+  created_at DateTime @default(now()) @db.Timestamptz
 
-  users User[]
-  products Product[]
-  categories Category[]
-  orders Order[]
-  orderItem OrderItem[]
-
+  points       Point[]
+  users         User[]
+  categories    Category[]
+  products      Product[]
+  orders        Order[]
+  orderItems    OrderItem[]
+  shifts        CashShift[]
+  withdrawals   Withdrawal[]
 }
 
+model Point {
+  id_point   Int    @id @default(autoincrement())
+  point      String @db.VarChar(100)
+  tag        String @db.VarChar(50)
+  active     Boolean @default(true)
+
+  id_market Int
+  market    Market @relation(fields: [id_market], references: [id_market])
+
+  users       User[]
+  categories  Category[]
+  products    Product[]
+  orders      Order[]
+  orderItems  OrderItem[]
+  shifts      CashShift[]
+  withdrawals Withdrawal[]
+
+  @@unique([tag, id_market])
+}
 
 model User {
-  id Int @id @default(autoincrement())
-  user String @unique @db.VarChar(100)
-  password String @db.Text
-  role Role @default(Vendedor)
-  active Boolean @default(true)
+  id         Int      @id @default(autoincrement())
+  user       String   @db.VarChar(100)
+  password   String   @db.Text
+  pin        String?  @db.VarChar(255)
+  role       Role     @default(Cajero)
+  active     Boolean  @default(true)
   created_at DateTime @default(now()) @db.Timestamptz
 
-  //FK
-  id_point Int
-  
-  point Point @relation(fields: [id_point],references:[id_point])
+  id_point  Int
+  id_market Int
+
+  point   Point  @relation(fields: [id_point], references: [id_point])
+  market  Market @relation(fields: [id_market], references: [id_market])
+
+  shifts      CashShift[]
+  withdrawals Withdrawal[]
+
+  @@unique([user, id_market])
 }
 
-// Categoría
 model Category {
-  id_category Int @id @default(autoincrement())
-  category String @db.VarChar(100)
+  id_category Int    @id @default(autoincrement())
+  category    String @db.VarChar(100)
   description String @db.Text
+  active      Boolean @default(true)
 
-  // FK
-  id_point Int
+  id_point  Int
+  id_market Int
 
-  point Point @relation(fields:[id_point],references: [id_point])
+  point   Point  @relation(fields: [id_point], references: [id_point])
+  market  Market @relation(fields: [id_market], references: [id_market])
   products Product[]
+
+  @@unique([category, id_market])
 }
 
-// Productos
-model Product{
-  id_product Int @id @default(autoincrement())
-  product_name String @db.VarChar(255)
-  price Float
-  stock Int
-  requires_cooking Boolean @default(false)
-  created_at DateTime @default(now()) @db.Timestamptz
+model Product {
+  id_product      Int      @id @default(autoincrement())
+  product_name    String   @db.VarChar(255)
+  price           Float
+  stock           Int
+  requires_cooking Boolean  @default(false)
+  active          Boolean  @default(true)
+  created_at      DateTime @default(now()) @db.Timestamptz
 
-  //FK
   id_category Int
-  id_point Int
+  id_point    Int
+  id_market   Int
 
-  category Category @relation(fields: [id_category], references: [id_category])
-  point Point @relation(fields:[id_point],references:[id_point])
-  orderItems OrderItem[]
-
+  category    Category     @relation(fields: [id_category], references: [id_category])
+  point       Point        @relation(fields: [id_point], references: [id_point])
+  market      Market       @relation(fields: [id_market], references: [id_market])
+  orderItems  OrderItem[]
 }
 
- // Pedidos
- model Order {
-  id_order Int @id @default(autoincrement())
-  order_number Int @unique @default(autoincrement())
-  status OrderStatus @default(Pendiente)
-  client_name String @db.VarChar(100)
-  client_dni Int
-  total Float
-  payment_method String @db.VarChar(100)
-  created_at DateTime @default(now()) @db.Timestamptz
+model Order {
+  id_order      Int          @id @default(autoincrement())
+  uuid          String       @unique @db.VarChar(36)
+  order_number  Int          @default(autoincrement())
+  status        OrderStatus  @default(Pendiente)
+  client_name   String       @db.VarChar(100)
+  client_dni    String?      @db.VarChar(20)
+  total         Float
+  payment_method PaymentMethod
+  synced        Boolean      @default(false)
+  created_at    DateTime     @default(now()) @db.Timestamptz
 
-  //FK
-  id_point Int
+  id_point  Int
+  id_market Int
 
-  point Point @relation(fields: [id_point],references: [id_point])
-  OrderItems OrderItem[]
-  
- }
+  point   Point  @relation(fields: [id_point], references: [id_point])
+  market  Market @relation(fields: [id_market], references: [id_market])
+  items    OrderItem[]
 
-/* ITEMS DE PEDIDO */
- model OrderItem {
-  id_order_item Int @id @default(autoincrement())
-  quantity Int
+  @@unique([order_number, id_market])
+  @@index([id_market, created_at])
+  @@index([id_market, status])
+  @@index([id_point, created_at])
+  @@index([id_point, status])
+  @@index([synced])
+}
+
+model OrderItem {
+  id_order_item Int    @id @default(autoincrement())
+  quantity      Int
   price_at_sale Float
 
-  //FK
-  id_order Int
+  id_order   Int
   id_product Int
-  id_point Int
+  id_point   Int
+  id_market  Int
 
-  order Order @relation(fields: [id_order],references: [id_order])
-  product Product @relation(fields: [id_product],references: [id_product])
-  point Point @relation(fields: [id_point],references: [id_point])
+  order   Order   @relation(fields: [id_order], references: [id_order], onDelete: Cascade)
+  product Product @relation(fields: [id_product], references: [id_product])
+  point   Point   @relation(fields: [id_point], references: [id_point])
+  market  Market  @relation(fields: [id_market], references: [id_market])
 
- }
+  @@index([id_order])
+  @@index([id_product])
+}
 
+model CashShift {
+  id_shift         Int         @id @default(autoincrement())
+  opened_at        DateTime    @default(now()) @db.Timestamptz
+  closed_at        DateTime?   @db.Timestamptz
+  opening_amount   Float
+  closing_amount    Float?
+  total_sales_cash  Float       @default(0)
+  total_sales_digital Float     @default(0)
+  total_withdrawals Float      @default(0)
+  expected_in_drawer Float?
+  status           ShiftStatus @default(Abierto)
+
+  id_user   Int
+  id_point  Int
+  id_market Int
+
+  user        User         @relation(fields: [id_user], references: [id])
+  point       Point        @relation(fields: [id_point], references: [id_point])
+  market      Market       @relation(fields: [id_market], references: [id_market])
+  withdrawals Withdrawal[]
+
+  @@index([id_market, status])
+  @@index([id_market, opened_at])
+  @@index([id_point, status])
+  @@index([id_point, opened_at])
+}
+
+model Withdrawal {
+  id_withdrawal Int      @id @default(autoincrement())
+  amount        Float
+  reason        String   @db.VarChar(255)
+  created_at    DateTime @default(now()) @db.Timestamptz
+
+  id_user   Int
+  id_point  Int
+  id_market Int
+  id_shift  Int
+
+  user  User      @relation(fields: [id_user], references: [id])
+  point Point     @relation(fields: [id_point], references: [id_point])
+  market Market   @relation(fields: [id_market], references: [id_market])
+  shift CashShift @relation(fields: [id_shift], references: [id_shift])
+
+  @@index([id_shift])
+  @@index([id_market, created_at])
+  @@index([id_point, created_at])
+}

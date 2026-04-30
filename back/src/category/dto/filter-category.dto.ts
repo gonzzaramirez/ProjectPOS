@@ -8,6 +8,11 @@ export class FilterCategoryDto {
   id_point?: number;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  id_market?: number;
+
+  @IsOptional()
   @IsString()
-  search?: string; // búsqueda por nombre de categoría
+  search?: string;
 }

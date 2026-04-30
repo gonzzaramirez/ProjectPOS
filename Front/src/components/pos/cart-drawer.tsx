@@ -38,6 +38,10 @@ type CartDrawerProps = {
   onUpdate: (productId: string, quantity: number) => void
   onRemove: (productId: string) => void
   onClear: () => void
+  onConfirmSale: (params: {
+    paymentMethod: PaymentMethod
+    amountPaid: number
+  }) => Promise<void> | void
 }
 
 const PAYMENT_LABELS: Record<PaymentMethod, string> = {
@@ -94,6 +98,7 @@ export function CartDrawer({
   onUpdate,
   onRemove,
   onClear,
+  onConfirmSale,
 }: CartDrawerProps) {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null)
   const [showCardPicker, setShowCardPicker]       = useState(false)
@@ -132,23 +137,35 @@ export function CartDrawer({
 
   // ── Confirm sale ───────────────────────────────────────────────────────────
 
-  const handleConfirmSale = () => {
+  const handleConfirmSale = async () => {
     const saleChange = change
     const saleTotal  = total
     const saleMethod = paymentMethod
     const label      = saleMethod ? PAYMENT_LABELS[saleMethod] : ""
 
-    onClear()
-    resetFlow()
-    onOpenChange(false)
+    try {
+      await onConfirmSale({
+        paymentMethod: saleMethod ?? "efectivo",
+        amountPaid,
+      })
+      onClear()
+      resetFlow()
+      onOpenChange(false)
 
-    sileo.success({
-      title: "Venta confirmada",
-      description:
-        saleMethod === "efectivo" && saleChange > 0
-          ? `${label} · Total: ${formatPrice(saleTotal)} | Vuelto: ${formatPrice(saleChange)}`
-          : `${label} · Total: ${formatPrice(saleTotal)}`,
-    })
+      sileo.success({
+        title: "Venta confirmada",
+        description:
+          saleMethod === "efectivo" && saleChange > 0
+            ? `${label} · Total: ${formatPrice(saleTotal)} | Vuelto: ${formatPrice(saleChange)}`
+            : `${label} · Total: ${formatPrice(saleTotal)}`,
+      })
+    } catch (error) {
+      sileo.error({
+        title: "Error al guardar venta",
+        description:
+          error instanceof Error ? error.message : "No se pudo registrar la venta",
+      })
+    }
   }
 
   // ── Efectivo helpers ───────────────────────────────────────────────────────

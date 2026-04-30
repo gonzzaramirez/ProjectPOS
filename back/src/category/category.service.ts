@@ -15,7 +15,7 @@ export class CategoryService {
   async create(createCategoryDto: CreateCategoryDto) {
     await this.validateNoDuplicateName(
       createCategoryDto.category,
-      createCategoryDto.id_point,
+      createCategoryDto.id_market,
     );
 
     return this.prisma.category.create({
@@ -25,9 +25,10 @@ export class CategoryService {
   }
 
   async findAll(filters: FilterCategoryDto) {
-    const { id_point, search } = filters;
+    const { id_point, id_market, search } = filters;
 
     const where = {
+      ...(id_market && { id_market }),
       ...(id_point && { id_point }),
       ...(search && {
         category: {
@@ -73,10 +74,9 @@ export class CategoryService {
   async update(id: number, dto: UpdateCategoryDto) {
     const existing = await this.findOne(id);
 
-    // si cambia el nombre, verifica que no duplique en el mismo point
     if (dto.category && dto.category !== existing.category) {
-      const pointId = dto.id_point ?? existing.id_point;
-      await this.validateNoDuplicateName(dto.category, pointId, id);
+      const marketId = dto.id_market ?? existing.id_market;
+      await this.validateNoDuplicateName(dto.category, marketId, id);
     }
 
     return this.prisma.category.update({
@@ -104,20 +104,20 @@ export class CategoryService {
   /* Validar categorias duplicadas */
   private async validateNoDuplicateName(
     name: string,
-    id_point: number,
+    id_market: number,
     excludeId?: number,
   ) {
     const duplicate = await this.prisma.category.findFirst({
       where: {
         category: { equals: name, mode: 'insensitive' },
-        id_point,
+        id_market,
         ...(excludeId && { NOT: { id_category: excludeId } }),
       },
     });
 
     if (duplicate) {
       throw new ConflictException(
-        `Ya existe una categoría con el nombre "${name}" en este punto de venta.`,
+        `Ya existe una categoría con el nombre "${name}" en este market.`,
       );
     }
   }
